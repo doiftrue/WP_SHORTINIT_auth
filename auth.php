@@ -26,12 +26,15 @@ function curr_user_can($capability){
 
 function get_curr_user_can(){
 	global $wpdb;
-	$_options = $wpdb->get_results("SELECT `option_name`, `option_value` FROM $wpdb->options WHERE `option_name` IN ('siteurl', '".$wpdb->prefix."user_roles')", 'OBJECT_K');
-	if(!$_options)
+	$_options = $wpdb->get_results("
+		SELECT `option_name`, `option_value` FROM $wpdb->options 
+		WHERE `option_name` IN ('siteurl', '{$wpdb->prefix}user_roles')
+	", 'OBJECT_K' );
+	if( ! $_options )
 		return array( 'error', 'Опции не найдены' );
 
 	$_c_hash = md5( $_options['siteurl']->option_value );
-	if( !isset( $_COOKIE['wordpress_logged_in_'.$_c_hash] ) )
+	if( ! isset( $_COOKIE['wordpress_logged_in_'.$_c_hash] ) )
 		return array( 'error', 'Кука отсутствует' );
 
 	$cookie          = $_COOKIE['wordpress_logged_in_'.$_c_hash];
@@ -58,8 +61,11 @@ function get_curr_user_can(){
 	if( ! hash_equals( $hash, $hmac ) )
 		return array( 'error', 'Хэш не эквивалентен' );
 
-	$user_options = $wpdb->get_results("SELECT `meta_key` ,`meta_value` FROM $wpdb->usermeta WHERE (`user_id`=".$user->ID.") AND (`meta_key` IN ('session_tokens', '".$wpdb->prefix."capabilities') )", OBJECT_K );
-	if(!$user_options)
+	$user_options = $wpdb->get_results("
+		SELECT `meta_key` ,`meta_value` FROM $wpdb->usermeta 
+		WHERE `user_id` = $user->ID AND `meta_key` IN ( 'session_tokens', '{$wpdb->prefix}capabilities' )
+	", OBJECT_K );
+	if( ! $user_options )
 		return array( 'error', 'Юзер опции не установлены' );
 
 	$sessions = unserialize($user_options['session_tokens']->meta_value);
