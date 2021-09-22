@@ -1,12 +1,12 @@
 <?php
 
-// указываем, что нам нужен минимум от WP
+// specify that we need a minimum from WP
 define('SHORTINIT', true);
 
-// подгружаем среду WordPress
+// Loading the WordPress environment
 require_once( $_SERVER['DOCUMENT_ROOT'] . '/wp/wp-load.php' );
 
-// укороченная версия wp_hash из pluggable.php
+// A shortened version of wp_hash from pluggable.php
 function wp_hash( $data ){
 	$salt = LOGGED_IN_KEY . LOGGED_IN_SALT;
 	return hash_hmac('md5', $data, $salt);
